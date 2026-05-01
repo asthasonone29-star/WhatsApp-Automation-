@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WhatsApp Automation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI';
+      background: #08101e;
+      color: white;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      margin-bottom: 20px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: none;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      background: #00c853;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Login / Signup</h2>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="signup()">Signup</button>
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div class="card">
+    <h2>WhatsApp Connect</h2>
+    <button onclick="connect()">Generate QR</button>
+  </div>
+
+  <div class="card">
+    <h2>Bulk Sender</h2>
+    <textarea id="numbers" placeholder="Enter numbers (comma separated)"></textarea>
+    <textarea id="message" placeholder="Message"></textarea>
+    <input id="delay" placeholder="Delay (ms)">
+    <button onclick="send()">Send Messages</button>
+  </div>
+
+</div>
+
+<script>
+let userId = "";
+
+async function signup() {
+  const res = await fetch("/signup", {
+    method: "POST",
+    body: JSON.stringify({
+      username: username.value,
+      password: password.value
+    })
+  });
+  alert(await res.text());
+}
+
+async function login() {
+  const res = await fetch("/login", {
+    method: "POST",
+    body: JSON.stringify({
+      username: username.value,
+      password: password.value
+    })
+  });
+  const data = JSON.parse(await res.text());
+  userId = data.userId;
+  alert("Logged in");
+}
+
+async function connect() {
+  await fetch("/connect", {
+    method: "POST",
+    body: JSON.stringify({ userId })
+  });
+  alert("Check terminal for QR");
+}
+
+async function send() {
+  const numbers = document.getElementById("numbers").value.split(",");
+  const message = document.getElementById("message").value;
+  const delay = parseInt(document.getElementById("delay").value);
+
+  await fetch("/send", {
+    method: "POST",
+    body: JSON.stringify({ userId, numbers, message, delay })
+  });
+
+  alert("Messages sent");
+}
+</script>
+
+</body>
+      </html>
